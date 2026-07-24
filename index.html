@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Crater-ion — Safety-Critical Autonomy for Precision Lunar Landing</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --dark:#080E18; --navy:#0D1B2A; --mid:#1A2E4A; --blue:#1E4D7B;
+  --cyan:#00C8FF; --cyan-dim:#005F7A; --amber:#F4A22C; --green:#2ECC71;
+  --white:#FFFFFF; --off:#E2EEF7; --grey:#7B96B2; --light:#C5D8E8;
+  --display:'Space Grotesk',sans-serif; --mono:'Space Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--dark);color:var(--off);font-family:var(--display);font-size:16px;line-height:1.6;overflow-x:hidden;}
+#starfield{position:fixed;inset:0;pointer-events:none;z-index:0;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 3rem;background:rgba(8,14,24,0.88);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,200,255,0.08);}
+.nav-logo{font-family:var(--mono);font-size:1.05rem;font-weight:700;letter-spacing:0.06em;color:var(--white);}
+.nav-logo span{color:var(--cyan);}
+nav ul{list-style:none;display:flex;gap:2rem;}
+nav ul a{color:var(--grey);text-decoration:none;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;transition:color .2s;}
+nav ul a:hover{color:var(--cyan);}
+
+/* SECTIONS */
+section{position:relative;z-index:1;}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;padding:8rem 3rem 4rem;overflow:hidden;}
+.hero-inner{max-width:1100px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:4rem;}
+.hero-eyebrow{font-family:var(--mono);font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--cyan);margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;}
+.hero-eyebrow::before{content:'';width:2rem;height:1px;background:var(--cyan);}
+h1{font-size:clamp(2.6rem,5vw,4.8rem);font-weight:700;line-height:1.05;color:var(--white);letter-spacing:-.02em;margin-bottom:1.5rem;}
+h1 em{color:var(--cyan);font-style:normal;}
+.hero-sub{font-size:1.1rem;color:var(--light);line-height:1.75;margin-bottom:2.5rem;max-width:480px;}
+.cta-row{display:flex;gap:1rem;flex-wrap:wrap;}
+.btn-p{background:var(--cyan);color:var(--dark);padding:.8rem 2rem;border-radius:4px;font-weight:700;font-size:.88rem;text-decoration:none;letter-spacing:.05em;transition:opacity .2s,transform .2s;}
+.btn-p:hover{opacity:.85;transform:translateY(-1px);}
+.btn-g{border:1px solid rgba(0,200,255,.35);color:var(--cyan);padding:.8rem 2rem;border-radius:4px;font-weight:500;font-size:.88rem;text-decoration:none;letter-spacing:.05em;transition:background .2s;}
+.btn-g:hover{background:rgba(0,200,255,.08);}
+
+/* Crater graphic */
+.crater-wrap{position:relative;width:100%;aspect-ratio:1;max-width:440px;justify-self:end;}
+.c-ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid;animation:pr 4s ease-in-out infinite;}
+.c-ring:nth-child(1){border-color:rgba(0,200,255,.2);animation-delay:0s;}
+.c-ring:nth-child(2){inset:12%;border-color:rgba(0,200,255,.15);animation-delay:.5s;}
+.c-ring:nth-child(3){inset:26%;border-color:rgba(244,162,44,.3);animation-delay:1s;}
+.c-ring:nth-child(4){inset:42%;border-color:rgba(0,200,255,.5);background:rgba(30,77,123,.15);animation-delay:1.5s;}
+.c-dot{position:absolute;border-radius:50%;background:var(--cyan);animation:drift 5s ease-in-out infinite alternate;}
+.c-dot:nth-child(5){width:7px;height:7px;top:16%;left:54%;}
+.c-dot:nth-child(6){width:5px;height:5px;top:66%;left:27%;background:var(--amber);animation-delay:1s;}
+.c-dot:nth-child(7){width:6px;height:6px;top:38%;left:80%;animation-delay:2s;}
+@keyframes pr{0%,100%{opacity:.5;transform:scale(1);}50%{opacity:1;transform:scale(1.018);}}
+@keyframes drift{from{transform:translate(0,0);}to{transform:translate(5px,-8px);}}
+
+/* PROBLEM */
+#problem{padding:6rem 3rem;max-width:1100px;margin:0 auto;}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);margin-bottom:1rem;}
+h2{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:700;color:var(--white);letter-spacing:-.01em;line-height:1.15;margin-bottom:1rem;}
+.lead{font-size:1.05rem;color:var(--light);max-width:620px;line-height:1.75;margin-bottom:3rem;}
+.p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+.p-card{background:var(--navy);border:1px solid rgba(0,200,255,.1);border-radius:8px;padding:2rem 1.75rem;transition:border-color .25s,transform .25s;}
+.p-card:hover{border-color:rgba(0,200,255,.3);transform:translateY(-3px);}
+.p-icon{font-size:1.8rem;margin-bottom:1rem;display:block;}
+.p-card h3{font-size:.95rem;font-weight:600;color:var(--white);margin-bottom:.5rem;}
+.p-card p{font-size:.88rem;color:var(--grey);line-height:1.65;}
+.p-stat{margin-top:2.5rem;background:rgba(244,162,44,.07);border:1px solid rgba(244,162,44,.2);border-radius:6px;padding:1.25rem 1.75rem;font-size:.95rem;color:var(--amber);font-weight:500;}
+
+/* WHAT WE BUILD */
+#build{padding:6rem 3rem;background:linear-gradient(180deg,var(--dark) 0%,var(--navy) 50%,var(--dark) 100%);}
+.build-inner{max-width:1100px;margin:0 auto;}
+.b-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-top:3rem;}
+.b-card{background:var(--mid);border-radius:8px;padding:2rem;border:1px solid rgba(0,200,255,.1);transition:border-color .25s;}
+.b-card:hover{border-color:rgba(0,200,255,.3);}
+.b-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:.75rem;}
+.b-card h3{font-size:1.05rem;font-weight:600;color:var(--white);margin-bottom:.6rem;}
+.b-card p{font-size:.88rem;color:var(--grey);line-height:1.65;}
+
+/* WHY IT MATTERS */
+#why{padding:6rem 3rem;max-width:1100px;margin:0 auto;}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;}
+.stat-card{text-align:center;padding:2.5rem 1.5rem;background:var(--navy);border-radius:8px;border:1px solid rgba(0,200,255,.1);}
+.stat-val{font-family:var(--mono);font-size:3rem;font-weight:700;color:var(--cyan);line-height:1;margin-bottom:.5rem;}
+.stat-label{font-size:.88rem;color:var(--grey);line-height:1.5;}
+.why-text{margin-top:3rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;}
+.why-text p{font-size:1rem;color:var(--light);line-height:1.8;}
+.why-quote{background:var(--navy);border-left:3px solid var(--cyan);padding:1.75rem 2rem;border-radius:0 8px 8px 0;font-size:1.05rem;color:var(--white);line-height:1.65;font-style:italic;}
+
+/* DEMO VIDEO */
+#demo{padding:6rem 3rem;background:var(--navy);}
+.demo-inner{max-width:1100px;margin:0 auto;}
+.video-wrap{margin-top:2.5rem;position:relative;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,255,.2);background:var(--mid);aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;}
+.vid-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(30,77,123,.5) 0%,transparent 60%),radial-gradient(ellipse at 75% 25%,rgba(0,95,122,.35) 0%,transparent 55%),var(--mid);}
+.vid-crater{position:absolute;right:7%;bottom:8%;width:220px;height:220px;pointer-events:none;}
+.vid-r{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(0,200,255,.12);animation:pr 3s ease-in-out infinite;}
+.vid-r:nth-child(2){inset:20%;border-color:rgba(0,200,255,.18);animation-delay:.5s;}
+.vid-r:nth-child(3){inset:42%;border-color:rgba(244,162,44,.28);animation-delay:1s;}
+.vid-lander{position:absolute;font-size:1.6rem;top:15%;left:14%;animation:descent 5s ease-in-out infinite alternate;z-index:1;}
+@keyframes descent{from{transform:translate(0,0) rotate(-4deg);}to{transform:translate(130px,90px) rotate(2deg);}}
+.play-wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:1.25rem;}
+.play-btn{width:5.5rem;height:5.5rem;border-radius:50%;background:rgba(0,200,255,.12);border:2px solid var(--cyan);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s,transform .2s;}
+.play-btn:hover{background:rgba(0,200,255,.25);transform:scale(1.06);}
+.play-btn svg{width:2rem;height:2rem;fill:var(--cyan);margin-left:5px;}
+.play-label{font-family:var(--mono);font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);position:relative;z-index:2;}
+.play-desc{font-size:.85rem;color:var(--grey);max-width:400px;text-align:center;line-height:1.65;position:relative;z-index:2;padding:0 2rem;}
+.vid-note{position:absolute;bottom:1.25rem;right:1.5rem;z-index:2;font-size:.7rem;font-family:var(--mono);color:rgba(0,200,255,.3);letter-spacing:.08em;}
+
+/* BUSINESS MODEL */
+#model{padding:6rem 3rem;max-width:1100px;margin:0 auto;}
+.phase-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:3rem;position:relative;}
+.phase-row::before{content:'';position:absolute;top:2.8rem;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.phase{padding:0 .75rem;text-align:center;position:relative;z-index:1;}
+.phase-num{font-family:var(--mono);font-size:.68rem;color:var(--cyan);letter-spacing:.15em;margin-bottom:.5rem;}
+.phase-node{width:4rem;height:4rem;border-radius:50%;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;font-size:1.4rem;border:2px solid var(--cyan);background:rgba(0,200,255,.08);}
+.phase h3{font-size:.9rem;font-weight:600;color:var(--white);margin-bottom:.5rem;}
+.phase p{font-size:.8rem;color:var(--grey);line-height:1.6;}
+.phase-arrow{position:absolute;top:2.5rem;right:-.4rem;color:var(--cyan);font-size:.9rem;z-index:2;}
+.phase:last-child .phase-arrow{display:none;}
+
+/* TEAM */
+#team{padding:6rem 3rem;background:var(--navy);}
+.team-inner{max-width:1100px;margin:0 auto;}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;}
+.t-card{background:var(--mid);border-radius:8px;padding:2rem 1.75rem;border:1px solid rgba(0,200,255,.1);}
+.t-role{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.5rem;}
+.t-card:nth-child(1) .t-role{color:var(--cyan);}
+.t-card:nth-child(2) .t-role{color:var(--amber);}
+.t-card:nth-child(3) .t-role{color:var(--green);}
+.t-card h3{font-size:1.05rem;font-weight:600;color:var(--white);margin-bottom:.75rem;}
+.t-card p{font-size:.85rem;color:var(--grey);line-height:1.65;margin-bottom:1rem;}
+.t-card a{font-family:var(--mono);font-size:.75rem;color:var(--cyan);text-decoration:none;}
+.t-card a:hover{text-decoration:underline;}
+
+/* FOOTER */
+footer{padding:3rem;border-top:1px solid rgba(0,200,255,.08);text-align:center;}
+.f-logo{font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.5rem;}
+.f-logo span{color:var(--cyan);}
+footer p{font-size:.82rem;color:var(--grey);margin-bottom:.35rem;}
+footer a{color:var(--cyan);text-decoration:none;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:1rem 1.5rem;}
+  nav ul{display:none;}
+  .hero-inner{grid-template-columns:1fr;}
+  .crater-wrap{display:none;}
+  #problem,#build,#why,#demo,#model,#team{padding:4rem 1.5rem;}
+  .p-grid,.b-grid,.stat-row,.team-grid,.phase-row{grid-template-columns:1fr;}
+  .why-text{grid-template-columns:1fr;}
+  .phase-row::before{display:none;}
+  .phase-arrow{display:none;}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+
+<nav>
+  <div class="nav-logo">CRATER<span>-ION</span></div>
+  <ul>
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#build">Solution</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#model">Model</a></li>
+    <li><a href="#team">Team</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Safety-Critical Space Autonomy</div>
+      <h1>Land precisely.<br>Even when<br><em>sensors fail.</em></h1>
+      <p class="hero-sub">
+        Crater-ion builds the autonomy layer that connects what a spacecraft sees, how confident it is, which sensor to trust, and a mathematical guarantee that the next move is safe — even when the AI upstream is wrong.
+      </p>
+      <div class="cta-row">
+        <a href="#demo" class="btn-p">Watch Demo</a>
+        <a href="mailto:crater-ion@example.com" class="btn-g">Get in Touch</a>
+      </div>
+    </div>
+    <div class="crater-wrap">
+      <div class="c-ring"></div>
+      <div class="c-ring"></div>
+      <div class="c-ring"></div>
+      <div class="c-ring"></div>
+      <div class="c-dot"></div>
+      <div class="c-dot"></div>
+      <div class="c-dot"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="eyebrow">The Problem</div>
+  <h2>Landers crash because their software wasn't built for the real world</h2>
+  <p class="lead">The final 60 seconds of descent are the most dangerous minutes of any lunar mission. Two of the last four commercial landers didn't survive them.</p>
+  <div class="p-grid">
+    <div class="p-card">
+      <span class="p-icon">👁</span>
+      <h3>Sensors go blind</h3>
+      <p>Dust and solar glare blind optical cameras at the exact moment accurate perception matters most — powered descent over hazardous terrain.</p>
+    </div>
+    <div class="p-card">
+      <span class="p-icon">🗺</span>
+      <h3>Maps don't match reality</h3>
+      <p>Orbital imagery lacks the resolution for real-time hazard avoidance. Landers routinely arrive at terrain that looks nothing like what they were programmed to expect.</p>
+    </div>
+    <div class="p-card">
+      <span class="p-icon">⚙️</span>
+      <h3>No safe fallback</h3>
+      <p>When sensors disagree or perception fails, classical guidance either aborts or flies blind. There is no system that gracefully handles uncertainty and stays safe.</p>
+    </div>
+  </div>
+  <div class="p-stat">
+    💥 &nbsp;2 of the last 4 commercial lunar landers crashed on descent — both attributed to navigation and sensor failures, not structural issues.
+  </div>
+</section>
+
+<!-- WHAT WE BUILD -->
+<section id="build">
+  <div class="build-inner">
+    <div class="eyebrow">What We Build</div>
+    <h2>The missing integration layer</h2>
+    <p class="lead">Every existing player solves one piece. We close the loop between all four — and license it as a single, certifiable product.</p>
+    <div class="b-grid">
+      <div class="b-card">
+        <div class="b-label">01 — Perception</div>
+        <h3>See through degradation</h3>
+        <p>Crater-aware optical navigation that continues functioning under lens flare, dust, and extreme lighting. Outputs a confidence score per detection — not just a binary result — so downstream systems know exactly how much to trust it.</p>
+      </div>
+      <div class="b-card">
+        <div class="b-label">02 — Uncertainty</div>
+        <h3>Know what you don't know</h3>
+        <p>Propagates "how wrong could this position fix be" forward in time. Eliminates the silent failure mode where a degraded perception estimate is treated as ground truth, eliminating the source of most descent accidents.</p>
+      </div>
+      <div class="b-card">
+        <div class="b-label">03 — Arbitration</div>
+        <h3>Decide who to trust</h3>
+        <p>When sensors give conflicting readings, the system decides which estimate to rely on — dynamically, in real time, without a ground operator. Can coordinate across multiple assets: lander, orbiter relay, or secondary surface robot.</p>
+      </div>
+      <div class="b-card">
+        <div class="b-label">04 — Safety Filter</div>
+        <h3>Guarantee safety, not just performance</h3>
+        <p>A control-barrier-function layer that mathematically guarantees the final trajectory never violates a hazard constraint — even if everything upstream was wrong. This is certifiable safety, not statistical confidence. The layer mission assurance reviewers have been waiting for.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY IT MATTERS -->
+<section id="why">
+  <div class="eyebrow">Market Opportunity</div>
+  <h2>The lunar market is growing.<br>The autonomy layer doesn't exist yet.</h2>
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-val">40+</div>
+      <div class="stat-label">Lunar missions planned<br>2024 – 2030</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">€8B+</div>
+      <div class="stat-label">Global lunar economy<br>projected by 2030</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">0</div>
+      <div class="stat-label">Licensable, certifiable<br>autonomy stacks available today</div>
+    </div>
+  </div>
+  <div class="why-text">
+    <p>
+      Commercial lunar missions are no longer hypothetical — they are flying now, with real operators, real budgets, and real liability when they fail. NASA's CLPS program, ESA's Argonaut, and a growing field of New Space lander companies are all building toward regular lunar surface access. Every one of them needs autonomy software they can validate, certify, and trust with a mission.
+      <br><br>
+      No European company currently sells a closed-loop, certifiable autonomy module for precision landing. We are building the product that fills that gap — and we're doing it before the window closes.
+    </p>
+    <div class="why-quote">
+      "The problem isn't building a smarter landing algorithm. The problem is building one that fails safely — and that you can prove fails safely to a regulator. That combination doesn't exist yet."
+    </div>
+  </div>
+</section>
+
+<!-- DEMO VIDEO -->
+<section id="demo">
+  <div class="demo-inner">
+    <div class="eyebrow">Demonstration</div>
+    <h2>See the closed loop in action</h2>
+    <p class="lead">A real-time descent simulation: perception degrades under simulated lens flare, uncertainty rises, the arbitration layer shifts weight to inertial navigation, and the safety filter guarantees a safe approach — all without human intervention.</p>
+
+    <div class="video-wrap">
+      <div class="vid-bg"></div>
+      <div class="vid-crater">
+        <div class="vid-r"></div>
+        <div class="vid-r"></div>
+        <div class="vid-r"></div>
+      </div>
+      <div class="vid-lander">🛸</div>
+
+      <div class="play-wrap">
+        <div class="play-btn" onclick="alert('Drop your demo video here. Replace this element with a <video> tag or a YouTube / Vimeo <iframe>.')">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="play-label">Demo Video — Coming Soon</div>
+        <div class="play-desc">
+          Lunar terrain digital twin: live visualization of perception confidence, uncertainty propagation, and CBF safety-filter intervention during powered descent.
+        </div>
+      </div>
+      <div class="vid-note">[ PLACE VIDEO HERE ]</div>
+    </div>
+  </div>
+</section>
+
+<!-- BUSINESS MODEL -->
+<section id="model">
+  <div class="eyebrow">Business Model</div>
+  <h2>From simulation toolkit<br>to mission-certified IP</h2>
+  <p class="lead">We license software, not hardware — a modular product that plugs into existing mission architectures without requiring a prime to redesign their stack around us.</p>
+  <div class="phase-row">
+    <div class="phase">
+      <div class="phase-num">Phase 01</div>
+      <div class="phase-node">🖥</div>
+      <span class="phase-arrow">›</span>
+      <h3>Simulation Toolkit</h3>
+      <p>Digital-twin validation environment sold to mission integrators. Early revenue while embedding in customer workflows.</p>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 02</div>
+      <div class="phase-node">📦</div>
+      <span class="phase-arrow">›</span>
+      <h3>Onboard Licence</h3>
+      <p>Per-mission software licence for the onboard autonomy package. First paying integration contract.</p>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 03</div>
+      <div class="phase-node">🤝</div>
+      <span class="phase-arrow">›</span>
+      <h3>Prime Co-development</h3>
+      <p>Subcontracted into lander prime supply chains. Recurring licence fees per mission flown.</p>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Phase 04</div>
+      <div class="phase-node">🛡</div>
+      <h3>Certification Tooling</h3>
+      <p>Standalone safety-assurance product extending into terrestrial robotics — mining, defence, disaster response.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team">
+  <div class="team-inner">
+    <div class="eyebrow">Team</div>
+    <h2>Three co-founders.<br>Built for this problem specifically.</h2>
+    <div class="team-grid">
+      <div class="t-card">
+        <div class="t-role">CEO & Co-Founder</div>
+        <h3>Menah Hammad</h3>
+        <p>Space Systems Engineer. M.Sc. Satellite Technology, Würzburg / Carleton. Spacecraft autonomy, GNC, and applied machine learning across five countries and seven institutions.</p>
+        <a href="https://github.com/menatallh" target="_blank">github.com/menatallh →</a>
+      </div>
+      <div class="t-card">
+        <div class="t-role">CTO & Co-Founder</div>
+        <h3>May Hammad</h3>
+        <p>Space Systems Engineer. M.Sc. Satellite Technology, Würzburg / Carleton. Reinforcement learning for constellation design at ZFT Würzburg. Published researcher in spaceborne optical navigation.</p>
+        <a href="https://github.com/mayhammad277" target="_blank">github.com/mayhammad277 →</a>
+      </div>
+      <div class="t-card">
+        <div class="t-role">Systems & Co-Founder</div>
+        <h3>Denis Acker</h3>
+        <p>Senior Systems Engineer on ROOVER, an active lunar surface mission. Flight software lead, Destiny+ Dust Analyzer (DLR / JAXA deep space mission). PhD candidate at the University of Stuttgart on lunar infrastructure systems.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">CRATER<span>-ION</span></div>
+  <p>Safety-Critical Autonomy for Precision Lunar Landing</p>
+  <p>
+    <a href="https://github.com/menatallh" target="_blank">github.com/menatallh</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/mayhammad277" target="_blank">github.com/mayhammad277</a>
+  </p>
+</footer>
+
+<script>
+const canvas=document.getElementById('starfield');
+const ctx=canvas.getContext('2d');
+let stars=[];
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+function init(){stars=[];const n=Math.floor(canvas.width*canvas.height/5500);for(let i=0;i<n;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.1+.2,a:Math.random(),da:(Math.random()-.5)*.003});}
+function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.a=Math.max(.05,Math.min(1,s.a+s.da));if(s.a<=.05||s.a>=1)s.da*=-1;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,230,255,${s.a*.55})`;ctx.fill();});requestAnimationFrame(draw);}
+resize();init();draw();
+window.addEventListener('resize',()=>{resize();init();});
+</script>
+</body>
+</html>
