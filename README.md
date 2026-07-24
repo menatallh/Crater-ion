@@ -50,3 +50,5 @@ Senior Systems Engineer, ROOVER lunar surface mission. Flight software lead, Des
 
 We are actively seeking design partners among GNC teams and lander integrators, and exploring seed investment.
 
+<img width="1254" height="1254" alt="Crater-ion_logo" src="https://github.com/user-attachments/assets/94ded63c-c945-4197-ad2c-2495a3441753" />
+/>
