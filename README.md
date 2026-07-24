@@ -50,6 +50,9 @@ Senior Systems Engineer, ROOVER lunar surface mission. Flight software lead, Des
 
 We are actively seeking design partners among GNC teams and lander integrators, and exploring seed investment.
 
+🌐 **[Read the full crater-ion pitch here](https://github.com/menatallh/Crater-ion/)** 
+
+
 
 <img width="1254" height="1254" alt="crater-ion_logo" src="https://github.com/user-attachments/assets/d6ef5e1e-fc02-4b19-90fd-69025ec235d6" />
 
